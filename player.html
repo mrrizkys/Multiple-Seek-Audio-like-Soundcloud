@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>CI-SOUND PLAYER</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script type="text/javascript">
+	var track_url = "http://localhost/sptemp/assets/music/";
+</script>
+
+
+<style type="text/css">
+
+.audio-vol
+{
+    width: 300px;
+    height: 10px;
+    background: #ddd;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+	
+.audio-bar
+{
+    width: 300px;
+    height: 10px;
+    background: #ddd;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.audio-hover
+{
+    width: 0%;
+    height: 100%;
+    background: #ff9ebf;
+}
+
+.audio-bar-active
+{
+    width: 0%;
+    height: 100%;
+    background: #E91E63;
+    position: absolute;
+    bottom: 0;
+}
+
+</style>
+</head>
+
+<body>
+<a href="#" class="loadpage">load page</a>
+
+
+<div class="audio-vol">
+</div>
+<br>
+
+
+<div id="track-list">
+	<a class="sel-track" href="#" play="track1.mp3">Track 1</a>
+	<div class="audio-ct" play="track1.mp3">
+		-:--
+	</div>
+	<div class="audio-bar" bar='1' play="track1.mp3">
+		<div class="audio-hover" bar='1' play="track1.mp3">
+		</div>
+		<div class="audio-bar-active" play="track1.mp3">
+		</div>
+	</div>
+
+	<br>
+	<a class="sel-track" href="#" play="Justy x Nasty - OP FULL Love Adventure SUBTHAI.mp3">Justy x Nasty - OP FULL【Love Adventure】</a>
+	<div class="audio-ct" play="Justy x Nasty - OP FULL Love Adventure SUBTHAI.mp3">
+		-:--
+	</div>
+	<div class="audio-bar" bar='2' play="Justy x Nasty - OP FULL Love Adventure SUBTHAI.mp3">
+		<div class="audio-hover" bar='2' play="Justy x Nasty - OP FULL Love Adventure SUBTHAI.mp3">
+		</div>
+		<div class="audio-bar-active" play="Justy x Nasty - OP FULL Love Adventure SUBTHAI.mp3">
+		</div>
+	</div>
+</div>
+
+
+
+<script type="text/javascript">
+	
+// player function
+var audio;
+var tracks = '';
+audio = new Audio('');
+
+function songDuration()
+{
+  $(audio).bind('timeupdate',function(){
+    //Get hours and minutes
+    var x = 1;
+    var s = parseInt(audio.currentTime % 60);
+    var m = parseInt(audio.currentTime / 60) % 60;
+    if(s < 10){
+      s = '0'+s;
+    }
+
+    $('.audio-ct').each(function(){
+
+    	var path = $(this).attr('play');
+
+    	if(path == tracks)
+    	{
+    		$(this).html(m + ':'+ s);
+    	}
+
+    });
+    var value = 0;
+    if(audio.currentTime > 0){
+      value = Math.floor((100 / audio.duration) * audio.currentTime);
+    }
+    $('.audio-bar-active').each(function(){
+
+    	var path = $(this).attr('play');
+
+    	if(path == tracks)
+    	{
+    		$(this).attr('style', 'width:'+value+'%');
+    	}
+
+    });
+    
+});
+}
+
+$('.sel-track').on('click', function(){
+	audio.pause();
+	tracks = $(this).attr('play');
+	var track = $(this).attr('play');
+	audio = new Audio(track_url+track);
+	audio.play();
+	songDuration();
+
+});
+
+$(".audio-bar").on("click", function(e){
+
+	audio.pause();
+    var offset = $(this).offset();
+    var left = (e.pageX - offset.left);
+    var totalWidth = $(".audio-bar").width();
+    var percentage = ( left / totalWidth );
+	tracks   =  $(this).attr('play');
+	var track = $(this).attr('play');
+	audio = new Audio(track_url+track);
+	audio.play();
+    songDuration();
+
+    setTimeout(function(){
+    	var audioTime = audio.duration * percentage;
+    	audio.currentTime = audioTime;
+	}, 100);
+});
+
+$('.audio-bar').bind('mousemove', function(e){
+
+	var bar    = $(this).attr('bar');
+    var offset = $(this).offset();
+    var left = (e.pageX - offset.left);
+    var totalWidth = $(".audio-bar").width();
+    var percentage = ( left / totalWidth );
+    var t = percentage * 100;
+
+    $('.audio-hover').each(function(){
+    	var barh = $(this).attr('bar');
+
+    	if(barh == bar)
+    	{
+    		$(this).attr('style', 'width:'+t+'%');
+    	}
+    });
+});
+
+$('.audio-bar').bind('mouseleave', function(e){
+
+	$('.audio-bar').each(function(){
+		$('.audio-hover').attr('style', 'width:0%');
+	})
+    
+});
+
+$('.audio-vol').bind('click', function(e){
+
+    var offset = $(this).offset();
+    var left = (e.pageX - offset.left);
+    var totalWidth = $(".audio-vol").width();
+    var percentage = ( left / totalWidth );
+    var t = percentage;
+    var v = t / 100;
+    audio.volume = parseFloat(t)
+});
+
+$('.loadpage').click(function(e)
+{
+ $('body').html('http://localhost/sptemp/index.html')
+ return false;
+});
+
+
+songDuration();
+</script>
+
+</body>
+</html>
